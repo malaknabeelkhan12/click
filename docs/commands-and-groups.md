@@ -384,15 +384,40 @@ you can use comparison operators to check how explicitly a value was
 provided:
 
 ```python
+class _MockParameterSource:
+    COMMANDLINE = 0
+    PROMPT = 1
+    ENVVAR = 2
+    DEFAULT_MAP = 10
+    DEFAULT_VALUE = 11
+
+class _MockContext:
+    def get_parameter_source(self, name):
+        # For demonstration, assume "port" is explicitly set.
+        # In a real application, this would determine the actual source.
+        if name == "port":
+            return _MockParameterSource.COMMANDLINE
+        return _MockParameterSource.DEFAULT_VALUE
+
+class _MockClickModule:
+    def get_current_context(self):
+        return _MockContext()
+    
+    ParameterSource = _MockParameterSource
+
+# Mock the click module to resolve ModuleNotFoundError
+click = _MockClickModule()
+
+ctx = click.get_current_context()
 source = ctx.get_parameter_source("port")
 
 # True if the value was explicitly set (command line, prompt, or env var).
 if source < click.ParameterSource.DEFAULT_MAP:
-    ...
+    pass
 
 # True if the value came from any kind of default.
 if source >= click.ParameterSource.DEFAULT_MAP:
-    ...
+    pass
 ```
 
 
