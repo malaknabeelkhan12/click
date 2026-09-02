@@ -370,6 +370,18 @@ class Repo:
 Ordinarily, it would be used with the `with` statement:
 
 ```python
+import os
+
+class _MockDbConnection:
+    def query(self, *args, **kwargs):
+        pass
+
+    def close(self):
+        pass
+
+def open_database(path):
+    return _MockDbConnection()
+
 with Repo() as repo:
     repo.db.query(...)
 ```
@@ -382,6 +394,8 @@ to enter the context manager and return the resource. When the group and
 any subcommands finish, the context's resources are cleaned up.
 
 ```python
+import src.click as click
+
 @click.group()
 @click.option("--repo-home", default=".repo")
 @click.pass_context
