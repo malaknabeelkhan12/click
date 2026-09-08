@@ -117,6 +117,12 @@ entirely hidden from us.
 Let's add our first child command to it, the clone command:
 
 ```python
+import click
+
+@click.group()
+def cli():
+    pass
+
 @cli.command()
 @click.argument('src')
 @click.argument('dest', required=False)
@@ -166,6 +172,9 @@ know that we want to find the closest `Repo` object, so let's make a
 decorator for this:
 
 ```python
+class Repo:
+    pass
+
 pass_repo = click.make_pass_decorator(Repo)
 ```
 
@@ -291,9 +300,35 @@ With `LazyGroup` defined, it's now possible to write a group which lazily loads 
 subcommands like so:
 
 ```python
-# in main.py
 import click
-from lazy_group import LazyGroup
+import importlib
+
+class LazyGroup(click.Group):
+    def __init__(self, *args, lazy_subcommands=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.lazy_subcommands = lazy_subcommands or {}
+
+    def list_commands(self, ctx):
+        base = super().list_commands(ctx)
+        lazy = sorted(self.lazy_subcommands.keys())
+        return base + lazy
+
+    def get_command(self, ctx, cmd_name):
+        if cmd_name in self.lazy_subcommands:
+            return self._lazy_load(cmd_name)
+        return super().get_command(ctx, cmd_name)
+
+    def _lazy_load(self, cmd_name):
+        import_path = self.lazy_subcommands[cmd_name]
+        modname, cmd_object_name = import_path.rsplit(".", 1)
+        mod = importlib.import_module(modname)
+        cmd_object = getattr(mod, cmd_object_name)
+        if not isinstance(cmd_object, click.Command):
+            raise ValueError(
+                f"Lazy loading of {import_path} failed by returning "
+                "a non-command object"
+            )
+        return cmd_object
 
 @click.group(
     cls=LazyGroup,
@@ -314,9 +349,7 @@ def cli():
 ```
 
 ```python
-# in bar.py
 import click
-from lazy_group import LazyGroup
 
 @click.group(
     cls=LazyGroup,
