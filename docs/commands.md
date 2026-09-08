@@ -221,6 +221,8 @@ line, then outputs it. If no subcommands are given, it outputs the contents
 of the file unchanged.
 
 ```python
+import click
+
 @click.group(chain=True, invoke_without_command=True)
 @click.argument("fin", type=click.File("r"))
 def cli(fin):
@@ -228,7 +230,7 @@ def cli(fin):
 
 @cli.result_callback()
 def process_pipeline(processors, fin):
-    iterator = (x.rstrip("\r\n") for x in input)
+    iterator = (x.rstrip("\r\n") for x in fin)
 
     for processor in processors:
         iterator = processor(iterator)
