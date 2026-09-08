@@ -372,7 +372,7 @@ Ordinarily, it would be used with the `with` statement:
 ```python
 import os
 
-class _MockDbConnection:
+class FakeDatabase:
     def query(self, *args, **kwargs):
         pass
 
@@ -380,7 +380,7 @@ class _MockDbConnection:
         pass
 
 def open_database(path):
-    return _MockDbConnection()
+    return FakeDatabase()
 
 with Repo() as repo:
     repo.db.query(...)
@@ -394,7 +394,7 @@ to enter the context manager and return the resource. When the group and
 any subcommands finish, the context's resources are cleaned up.
 
 ```python
-import src.click as click
+import click
 
 @click.group()
 @click.option("--repo-home", default=".repo")
