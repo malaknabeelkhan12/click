@@ -27,6 +27,8 @@ This is not a bug in Click. The decorator replaced the function with a {class}`C
 The recommended pattern is to keep a plain function and wrap it with a thin command:
 
 ```python
+import click
+
 def nasa_date_to_iso(datestr): ...
 
 
