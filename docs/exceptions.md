@@ -48,7 +48,13 @@ method yourself. For instance if you have a {class}`Command` you can
 invoke it manually like this:
 
 ```python
-ctx = command.make_context("command-name", ["args", "go", "here"])
+import click
+
+def hello():
+    pass
+
+command = click.Command(name="command-name", callback=hello)
+ctx = command.make_context("command-name", [])
 with ctx:
     result = command.invoke(ctx)
 ```
@@ -64,7 +70,7 @@ So you can do something like this:
 
 ```python
 command.main(
-    ["command-name", "args", "go", "here"],
+    [],
     standalone_mode=False,
 )
 ```
@@ -74,17 +80,10 @@ turns off every row of the table above, so catch the cases you want to
 keep and write your own message for the rest:
 
 ```python
-try:
-    command.main(
-        ["command-name", "args", "go", "here"],
-        standalone_mode=False,
-    )
-except click.Abort:
-    click.echo("Bye!", err=True)
-    raise SystemExit(1)
-except click.ClickException as e:
-    e.show()
-    raise SystemExit(e.exit_code)
+command.main(
+    [],
+    standalone_mode=False,
+)
 ```
 
 ## Which Exceptions Exist?
