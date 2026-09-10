@@ -372,16 +372,15 @@ Ordinarily, it would be used with the `with` statement:
 ```python
 import os
 
-class _MockDatabase:
-    def __init__(self, path):
-        pass
+class MockDB:
     def query(self, *args, **kwargs):
         pass
+
     def close(self):
         pass
 
 def open_database(path):
-    return _MockDatabase(path)
+    return MockDB()
 
 with Repo() as repo:
     repo.db.query(...)
