@@ -39,11 +39,11 @@ replaced with the {func}`password_option` decorator:
 
 ```python
     import click
+import codecs
 
 @click.command()
 @click.password_option()
 def encrypt(password):
-    import codecs
     click.echo(f"encoded: to {codecs.encode(password, 'rot13')}")
 ```
 
