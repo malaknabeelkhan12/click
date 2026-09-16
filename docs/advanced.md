@@ -373,6 +373,9 @@ Ordinarily, it would be used with the `with` statement:
 import os
 
 class MockDB:
+    def __init__(self, path):
+        pass
+
     def query(self, *args, **kwargs):
         pass
 
@@ -380,7 +383,7 @@ class MockDB:
         pass
 
 def open_database(path):
-    return MockDB()
+    return MockDB(path)
 
 with Repo() as repo:
     repo.db.query(...)
