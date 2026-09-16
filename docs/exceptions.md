@@ -50,11 +50,12 @@ invoke it manually like this:
 ```python
 import click
 
-def hello():
+@click.command()
+@click.argument('args', nargs=-1)
+def command(args):
     pass
 
-command = click.Command(name="command-name", callback=hello)
-ctx = command.make_context("command-name", [])
+ctx = command.make_context("command-name", ["args", "go", "here"])
 with ctx:
     result = command.invoke(ctx)
 ```
@@ -70,7 +71,7 @@ So you can do something like this:
 
 ```python
 command.main(
-    [],
+    ["command-name", "args", "go", "here"],
     standalone_mode=False,
 )
 ```
@@ -80,10 +81,17 @@ turns off every row of the table above, so catch the cases you want to
 keep and write your own message for the rest:
 
 ```python
-command.main(
-    [],
-    standalone_mode=False,
-)
+try:
+    command.main(
+        ["command-name", "args", "go", "here"],
+        standalone_mode=False,
+    )
+except click.Abort:
+    click.echo("Bye!", err=True)
+    raise SystemExit(1)
+except click.ClickException as e:
+    e.show()
+    raise SystemExit(e.exit_code)
 ```
 
 ## Which Exceptions Exist?
